@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>KUC-KUC — keramičarski radovi | kupatila, kuhinje, terase</title>
+<meta name="description" content="Keramičarski radovi: kupatila, kuhinje, terase i stepeništa. Ravnanje podloge, hidroizolacija, velike ploče do 120 × 60, gerung 45°, fugna od 2 mm.">
+<meta property="og:title" content="KUC-KUC — keramičarski radovi">
+<meta property="og:description" content="Kucnite bilo koju pločicu. Nijedna ne zvuči šuplje.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#121211">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cg fill='%231E5E4E'%3E%3Crect x='4' y='4' width='26' height='26'/%3E%3Crect x='34' y='4' width='26' height='26'/%3E%3Crect x='4' y='34' width='26' height='26'/%3E%3Crect x='34' y='34' width='26' height='26'/%3E%3C/g%3E%3Cpath fill='%23E8461E' d='M30 18h4v28h-4zM18 30h28v4H18z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<style>
+/* ==========================================================================
+   KUC-KUC — keramičarski radovi (demo, Start paket)
+   Jedna stranica. 3D scene: three.js sa jsDelivr CDN-a (vidi kraj fajla).
+   ========================================================================== */
+:root {
+  --char: #121211;
+  --char-line: #2E2D29;
+  --paper: #F2F0EB;
+  --stone: #E7E4DE;
+  --cement: #D9D5CD;
+  --grout: #C9C4BA;
+  --ink: #111110;
+  --muted: #5B574F;
+  --muted-dk: #A39E94;
+  --glaze: #1E5E4E;
+  --glaze-hi: #93D9BC;
+  --spacer: #E8461E;
+  --kraft: #B58D5E;
+  --sans: 'Bricolage Grotesque', 'Arial Narrow', Arial, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --pad: clamp(16px, 4vw, 56px);
+  --maxw: 1360px;
+  --sec: clamp(64px, 9vw, 128px);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.5;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+}
+img, canvas { display: block; max-width: 100%; }
+a { color: inherit; }
+ol, ul { list-style: none; padding: 0; }
+:focus-visible { outline: 3px solid var(--spacer); outline-offset: 3px; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 var(--pad); }
+.kicker {
+  font: 600 12px/1.3 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+h1, h2, h3 { font-weight: 800; }
+h2 {
+  font-size: clamp(36px, 4.8vw, 74px);
+  font-stretch: 76%;
+  font-variation-settings: "wdth" 76;
+  line-height: .94;
+  letter-spacing: -.01em;
+  padding-top: .08em;
+  text-wrap: balance;
+}
+h2 span { color: var(--glaze); }
+.intro { font-size: clamp(17px, 1.3vw, 19px); color: var(--muted); max-width: 34em; }
+
+/* ---------- dugmad ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 0 24px;
+  font: 700 16px/1 var(--sans);
+  text-decoration: none;
+  border: 2px solid currentColor;
+  transition: background-color .2s, color .2s, border-color .2s, transform .2s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-accent { background: var(--spacer); color: var(--ink); border-color: var(--ink); }
+.btn-accent:hover { background: #FF5B2E; }
+.btn-ghost { color: var(--paper); border-color: #5C5A53; }
+.btn-ghost:hover { border-color: var(--paper); }
+.btn-call { min-height: 44px; padding: 0 18px; font-size: 15px; background: var(--spacer); color: var(--ink); border-color: var(--spacer); }
+.btn-call:hover { background: #FF5B2E; border-color: #FF5B2E; }
+
+/* ---------- zaglavlje ---------- */
+.top { background: var(--char); color: var(--paper); border-bottom: 1px solid var(--char-line); }
+.top-in { display: flex; align-items: center; gap: 24px; min-height: 72px; }
+.logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+.logo-tile {
+  width: 30px; height: 30px; flex: none;
+  background:
+    linear-gradient(var(--char) 0 0) 50% 0 / 3px 100% no-repeat,
+    linear-gradient(var(--char) 0 0) 0 50% / 100% 3px no-repeat,
+    linear-gradient(135deg, #4BA488 0%, #1E5E4E 48%, #0E392F 100%);
+}
+.logo-name {
+  font-weight: 800;
+  font-size: 27px;
+  line-height: 1;
+  letter-spacing: .03em;
+  font-stretch: 75%;
+  font-variation-settings: "wdth" 75;
+}
+.logo-sub {
+  font: 500 11px/1.25 var(--mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted-dk);
+  border-left: 1px solid var(--char-line);
+  padding-left: 12px;
+}
+.nav { margin-left: auto; display: flex; gap: 28px; }
+.nav a { font-weight: 600; font-size: 15px; text-decoration: none; color: #CFCAC0; }
+.nav a:hover { color: var(--paper); }
+@media (max-width: 900px) {
+  .nav { display: none; }
+  .top .btn-call { margin-left: auto; }
+}
+@media (max-width: 400px) {
+  .logo-sub { display: none; }
+}
+
+/* ---------- hero ---------- */
+.hero { background: var(--char); color: var(--paper); overflow: hidden; }
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  grid-template-areas: ". stage" "head stage" "body stage" ". stage";
+  grid-template-rows: 1fr auto auto 1.15fr;
+  column-gap: clamp(24px, 3vw, 48px);
+  min-height: min(calc(100svh - 72px), 900px);
+}
+.hero-head { grid-area: head; padding-top: 32px; }
+.hero-head .kicker { color: var(--muted-dk); }
+.hero-title {
+  margin-top: 18px;
+  font-size: clamp(46px, 6.2vw, 100px);
+  font-stretch: 75%;
+  font-variation-settings: "wdth" 75;
+  line-height: .9;
+  letter-spacing: -.012em;
+  padding-top: .06em;
+}
+.hero-title em { display: block; font-style: normal; color: var(--glaze-hi); }
+.hero-body { grid-area: body; padding: 28px 0 56px; }
+.lead { font-size: clamp(17px, 1.3vw, 20px); color: #CFCAC0; max-width: 33em; }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+
+/* ---------- 3D pozornice ---------- */
+.stage { position: relative; overflow: hidden; }
+.stage canvas {
+  position: absolute; inset: 0;
+  width: 100% !important; height: 100% !important;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.stage canvas:active { cursor: grabbing; }
+.stage-hero { grid-area: stage; min-height: 560px; margin-right: calc(-1 * var(--pad)); }
+.hud {
+  position: absolute; left: 16px; top: 16px; z-index: 2;
+  display: flex; align-items: center; gap: 10px;
+  font: 600 12px/1 var(--mono);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: rgba(10, 10, 9, .66);
+  border: 1px solid #3A3934;
+  padding: 10px 12px;
+  pointer-events: none;
+}
+.hud-dot { width: 8px; height: 8px; flex: none; background: var(--spacer); animation: blink 1.2s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+.hud-light { background: rgba(255, 255, 255, .82); color: var(--ink); border-color: var(--ink); top: 14px; left: 14px; }
+.hint {
+  position: absolute; right: 16px; bottom: 18px; z-index: 2;
+  font: 500 11px/1 var(--mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: #8D887E;
+  pointer-events: none;
+}
+.stage:not(.is-live) .hud, .stage:not(.is-live) .hint { display: none; }
+/* rezervni prikaz kad 3D ne može da se učita */
+.stage-fallback { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.stage-fallback::before {
+  content: "";
+  width: min(56%, 420px);
+  aspect-ratio: 1;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(25% - 3px), #D9D4CA calc(25% - 3px) 25%),
+    repeating-linear-gradient(0deg, transparent 0 calc(25% - 3px), #D9D4CA calc(25% - 3px) 25%),
+    linear-gradient(135deg, #3E9179, #1E5E4E 45%, #10362D);
+  transform: perspective(900px) rotateX(55deg) rotateZ(-32deg);
+  box-shadow: 0 30px 40px -20px rgba(0, 0, 0, .6);
+}
+.stage.is-live .stage-fallback { display: none; }
+
+@media (max-width: 860px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "head" "stage" "body";
+    grid-template-rows: auto;
+    min-height: 0;
+  }
+  .hero-head { padding-top: 28px; }
+  .stage-hero { min-height: 0; aspect-ratio: 1 / 1; margin: 8px calc(-1 * var(--pad)) 0; }
+  .hero-body { padding: 18px 0 44px; }
+  .cta-row .btn { flex: 1 1 100%; }
+}
+
+/* ---------- deklaracija (nalepnica sa kutije) ---------- */
+.decl {
+  background-color: var(--kraft);
+  background-image:
+    repeating-linear-gradient(87deg, rgba(60, 38, 16, .05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(-4deg, rgba(255, 236, 200, .06) 0 1px, transparent 1px 5px);
+  padding: 28px 0;
+  border-block: 2px solid var(--ink);
+}
+.decl-label {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) minmax(0, 1.1fr);
+  gap: 2px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  box-shadow: 0 12px 22px -14px rgba(40, 24, 8, .7);
+  transform: rotate(-.35deg);
+}
+.decl-cell, .decl-code { background: #FBFAF6; padding: 14px 16px 16px; }
+.decl-cell span {
+  display: block;
+  font: 600 11px/1.2 var(--mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.decl-cell b {
+  display: block;
+  margin-top: 6px;
+  font-size: clamp(19px, 1.6vw, 24px);
+  font-weight: 800;
+  font-stretch: 80%;
+  font-variation-settings: "wdth" 80;
+  line-height: 1.05;
+}
+.decl-code { display: flex; flex-direction: column; justify-content: center; gap: 7px; }
+.bars {
+  display: block;
+  height: 34px;
+  background: repeating-linear-gradient(90deg,
+    #111 0 2px, transparent 2px 4px, #111 4px 5px, transparent 5px 8px,
+    #111 8px 11px, transparent 11px 12px, #111 12px 13px, transparent 13px 17px,
+    #111 17px 18px, transparent 18px 21px);
+}
+.decl-code small { font: 600 10px/1 var(--mono); letter-spacing: .2em; }
+@media (max-width: 860px) {
+  .decl-label { grid-template-columns: 1fr 1fr; transform: none; }
+}
+
+/* ---------- ispod pločice (3D presek) ---------- */
+.ispod { background: var(--stone); padding: var(--sec) 0; }
+.ispod-grid {
+  display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  grid-template-areas: "head stage" "list stage";
+  grid-template-rows: auto 1fr;
+  gap: 0 clamp(28px, 4vw, 64px);
+}
+.ispod-head { grid-area: head; display: grid; gap: 16px; }
+.ispod-head .intro { margin-top: 4px; }
+.stage-layers {
+  grid-area: stage;
+  align-self: start;
+  position: sticky; top: 24px;
+  height: min(84vh, 720px);
+  border: 2px solid var(--ink);
+  background: radial-gradient(120% 90% at 50% 32%, #F6F4F0 0%, #E0DCD4 72%);
+}
+.stage-layers .hint { color: var(--muted); }
+.layers { grid-area: list; margin-top: 34px; border-bottom: 2px solid var(--ink); }
+.layers li {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 4px 16px;
+  padding: 16px 14px 16px 12px;
+  border-top: 2px solid var(--ink);
+  transition: background-color .25s;
+  cursor: default;
+}
+.layers .sw {
+  grid-row: span 2;
+  width: 30px; height: 30px;
+  background: var(--c);
+  border: 2px solid var(--ink);
+  transition: transform .25s, box-shadow .25s;
+}
+.layers b { font-size: 21px; font-weight: 800; line-height: 1.15; }
+.layers b small { font: 600 12px/1 var(--mono); letter-spacing: .1em; color: var(--muted); margin-right: 10px; vertical-align: 3px; }
+.layers p { grid-column: 2; color: var(--muted); font-size: 16px; }
+.layers li.is-on { background: var(--paper); }
+.layers li.is-on .sw { transform: translateY(-5px); box-shadow: 0 5px 0 var(--ink); }
+@media (max-width: 860px) {
+  .ispod-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "stage" "list"; }
+  .stage-layers { position: relative; top: 0; height: auto; aspect-ratio: 1 / 1; margin-top: 28px; }
+  .layers { margin-top: 24px; }
+}
+
+/* ---------- prostorije ---------- */
+.rooms { background: var(--paper); padding: var(--sec) 0; border-top: 2px solid var(--ink); }
+.sec-head { display: grid; gap: 16px; margin-bottom: clamp(30px, 4vw, 52px); max-width: 920px; }
+.tiles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
+  background: var(--grout);
+  border: 2px solid var(--ink);
+}
+.room {
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 290px;
+  padding: 26px 24px 28px;
+  background: linear-gradient(165deg, #FFFFFF 0%, #F6F4EF 46%, #EBE8E1 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06), inset 0 2px 0 rgba(255, 255, 255, .9);
+  transition: transform .25s, box-shadow .25s;
+}
+.room:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06), 0 16px 22px -14px rgba(0, 0, 0, .45); }
+.room-n { font: 600 12px/1 var(--mono); letter-spacing: .12em; color: var(--muted); }
+.room h3 {
+  font-size: clamp(30px, 2.6vw, 40px);
+  font-stretch: 78%;
+  font-variation-settings: "wdth" 78;
+  line-height: 1;
+  padding-top: .08em;
+}
+.trap { font-weight: 650; font-size: 18px; line-height: 1.3; }
+.trap span {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 5px 7px 4px;
+  font: 700 11px/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  background: var(--spacer);
+  color: var(--ink);
+  vertical-align: 2px;
+}
+.room .txt { color: var(--muted); font-size: 16px; }
+@media (max-width: 1020px) { .tiles-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) {
+  .tiles-grid { grid-template-columns: minmax(0, 1fr); gap: 6px; padding: 6px; }
+  .room { min-height: 0; }
+}
+
+/* ---------- pre kupovine (3D kutija) ---------- */
+.buy { background: var(--stone); padding: var(--sec) 0; border-block: 2px solid var(--ink); }
+.buy-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 72px); align-items: center; }
+.stage-box {
+  aspect-ratio: 5 / 4;
+  border: 2px solid var(--ink);
+  background: radial-gradient(110% 90% at 50% 34%, #F7F5F1 0%, #D9D4CB 82%);
+}
+.stage-box .hint { color: var(--muted); }
+.buy-text { display: grid; gap: 16px; }
+.tips { margin-top: 18px; border-bottom: 2px solid var(--ink); }
+.tips li { display: grid; grid-template-columns: 116px minmax(0, 1fr); gap: 18px; padding: 20px 0; border-top: 2px solid var(--ink); }
+.tips .big {
+  font-size: 52px;
+  font-weight: 800;
+  font-stretch: 75%;
+  font-variation-settings: "wdth" 75;
+  line-height: .9;
+  color: var(--glaze);
+  padding-top: .06em;
+}
+.tips h3 { font-size: 22px; line-height: 1.15; }
+.tips p { color: var(--muted); margin-top: 6px; font-size: 16px; }
+@media (max-width: 860px) {
+  .buy-grid { grid-template-columns: minmax(0, 1fr); }
+  .tips li { grid-template-columns: 84px minmax(0, 1fr); gap: 14px; }
+  .tips .big { font-size: 40px; }
+}
+
+/* ---------- kako ide ---------- */
+.process { background: var(--char); color: var(--paper); padding: var(--sec) 0; }
+.process .kicker { color: var(--muted-dk); }
+.process h2 span { color: var(--glaze-hi); }
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px clamp(18px, 2.4vw, 36px); }
+.steps li { position: relative; border-top: 2px solid #46443E; padding-top: 30px; }
+.steps li::before {
+  content: "";
+  position: absolute; top: -13px; left: -2px;
+  width: 24px; height: 24px;
+  background:
+    linear-gradient(var(--spacer) 0 0) 50% 0 / 6px 100% no-repeat,
+    linear-gradient(var(--spacer) 0 0) 0 50% / 100% 6px no-repeat;
+}
+.step-n { font: 600 12px/1 var(--mono); letter-spacing: .12em; color: var(--muted-dk); }
+.steps h3 {
+  margin: 12px 0 10px;
+  font-size: 25px;
+  font-stretch: 82%;
+  font-variation-settings: "wdth" 82;
+  line-height: 1.1;
+}
+.steps p { color: #BDB8AE; font-size: 16px; }
+@media (max-width: 1020px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .steps { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- radovi ---------- */
+.work { background: var(--paper); padding: var(--sec) 0; }
+.work-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; }
+.ph-frame {
+  position: relative;
+  grid-column: span 2;
+  aspect-ratio: 4 / 3;
+  display: grid; place-items: center;
+  padding: 24px;
+  text-align: center;
+  background: var(--cement);
+  border: 2px solid var(--ink);
+}
+.ph-frame.big { grid-column: span 3; }
+.ph-frame figcaption { font: 500 13px/1.55 var(--mono); color: var(--muted); }
+.tag {
+  position: absolute; left: -2px; top: -2px;
+  padding: 8px 10px;
+  font: 700 12px/1 var(--mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  background: var(--ink);
+  color: var(--paper);
+}
+.tag-after { background: var(--glaze); }
+@media (max-width: 760px) {
+  .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .ph-frame, .ph-frame.big { grid-column: span 2; }
+  .ph-frame.sm { grid-column: span 1; aspect-ratio: 1; padding: 14px; }
+  .ph-frame.sm:last-child { grid-column: span 2; aspect-ratio: 16 / 9; }
+  .ph-frame figcaption { font-size: 12px; }
+}
+
+/* ---------- kontakt ---------- */
+.contact { background: var(--glaze); color: var(--paper); padding: var(--sec) 0; }
+.contact-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); gap: clamp(36px, 5vw, 88px); }
+.contact .kicker { color: var(--glaze-hi); }
+.contact h2 { margin-top: 16px; }
+.contact h2 span { color: var(--glaze-hi); }
+.contact .intro { color: #D5E6DE; margin-top: 20px; }
+.phone {
+  display: inline-block;
+  margin-top: 36px;
+  padding-top: .06em;
+  font-size: clamp(40px, 6.4vw, 100px);
+  font-weight: 800;
+  font-stretch: 75%;
+  font-variation-settings: "wdth" 75;
+  line-height: .95;
+  text-decoration: none;
+  border-bottom: 6px solid var(--spacer);
+}
+.phone:hover { color: #FFFFFF; }
+.channels { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 36px; }
+.channels a {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  min-height: 56px;
+  padding: 0 16px;
+  font-weight: 700;
+  text-decoration: none;
+  border: 2px solid var(--paper);
+  transition: background-color .2s, color .2s;
+}
+.channels a:hover { background: var(--paper); color: var(--glaze); }
+.facts div { padding: 16px 0; border-top: 1px solid rgba(242, 240, 235, .35); }
+.facts dt { font: 600 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--glaze-hi); }
+.facts dd { margin: 8px 0 0; font-size: 22px; font-weight: 700; line-height: 1.25; }
+.map-ph {
+  margin-top: 22px;
+  aspect-ratio: 4 / 3;
+  display: grid; place-items: center;
+  padding: 20px;
+  text-align: center;
+  font: 500 13px/1.5 var(--mono);
+  color: #CFE3DA;
+  background: #174C40;
+  border: 2px solid var(--paper);
+}
+@media (max-width: 860px) {
+  .contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .channels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ---------- podnožje ---------- */
+.foot { background: var(--char); color: #BDB8AE; padding: 30px 0; font-size: 14px; }
+.foot-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 28px; }
+.foot .logo { color: var(--paper); }
+.foot a:not(.logo) { text-decoration: none; }
+.foot a:not(.logo):hover { color: var(--paper); }
+.foot-nav { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="logo" href="#top" aria-label="KUC-KUC, keramičarski radovi — na vrh stranice">
+      <span class="logo-tile" aria-hidden="true"></span>
+      <span class="logo-name">KUC-KUC</span>
+      <span class="logo-sub">keramičarski<br>radovi</span>
+    </a>
+    <nav class="nav" aria-label="Glavna navigacija">
+      <a href="#ispod">Ispod pločice</a>
+      <a href="#prostorije">Prostorije</a>
+      <a href="#radovi">Radovi</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <!-- ZAMENITI: href="tel:+381..." kad bude pravi broj -->
+    <a class="btn btn-call" href="#kontakt">Pozovite</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div class="hero-head">
+        <p class="kicker">Keramičarski radovi · Ovde ide grad i okolina</p>
+        <h1 class="hero-title">Kucnite bilo koju pločicu. <em>Nijedna ne zvuči šuplje.</em></h1>
+      </div>
+      <div class="hero-body">
+        <p class="lead">Kupatila, kuhinje, terase i stepeništa. Podloga se prvo ravna, a lepak se nanosi bez praznih džepova — pa pločica naleže celom površinom, a ne na pet tačaka lepka.</p>
+        <div class="cta-row">
+          <a class="btn btn-accent" href="#kontakt">Pozovite</a>
+          <a class="btn btn-ghost" href="#kontakt">Slika prostora na Viber</a>
+        </div>
+      </div>
+      <div class="stage stage-hero" id="stageHero" role="img" aria-label="3D animacija polaganja: lepak, pločice, krstići i fugovanje, redom">
+        <div class="stage-fallback" aria-hidden="true"></div>
+        <p class="hud" aria-hidden="true"><span class="hud-dot"></span><span id="heroPhase">01 · Lepak</span></p>
+        <p class="hint" aria-hidden="true">Kucnite pločicu · povucite ↔</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="decl" aria-label="Ukratko">
+    <div class="wrap">
+      <div class="decl-label">
+        <div class="decl-cell"><span>Format</span><b>do 120 × 60 cm</b></div>
+        <div class="decl-cell"><span>Fugna</span><b>od 2 mm</b></div>
+        <div class="decl-cell"><span>Ivice</span><b>gerung 45°</b></div>
+        <div class="decl-cell"><span>Tuš</span><b>u ravni poda</b></div>
+        <div class="decl-cell"><span>Terase</span><b>mrazootporno</b></div>
+        <div class="decl-code" aria-hidden="true"><i class="bars"></i><small>KUC-KUC · KLASA I</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ispod" id="ispod">
+    <div class="wrap ispod-grid">
+      <div class="ispod-head">
+        <p class="kicker">[ Presek poda ]</p>
+        <h2>Pločica je poslednji sloj. <span>Ne i najvažniji.</span></h2>
+        <p class="intro">Pločicu gledate svaki dan. Ono ispod nje ne vidite nikad — sve dok jedan sloj ne popusti. Zato se svaki radi kao da će neko da ga pregleda. Odozdo nagore:</p>
+      </div>
+      <div class="stage stage-layers" id="stageLayers" role="img" aria-label="3D presek poda: šest slojeva, od betona do fugne">
+        <div class="stage-fallback" aria-hidden="true"></div>
+        <p class="hud hud-light" aria-hidden="true"><span id="layerName">01 · Podloga</span></p>
+        <p class="hint" aria-hidden="true">← povucite →</p>
+      </div>
+      <ol class="layers" id="layers">
+        <li data-layer="0" tabindex="0"><i class="sw" style="--c:#958F84"></i><b><small>01</small>Podloga</b><p>Proverava se letvom od dva metra. Grbe i rupe se ravnaju sada, a ne debljim slojem lepka.</p></li>
+        <li data-layer="1" tabindex="0"><i class="sw" style="--c:#DDB7A8"></i><b><small>02</small>Prajmer</b><p>Da beton ne popije vodu iz lepka. Bez prajmera lepak se osuši pre nego što stigne da veže.</p></li>
+        <li data-layer="2" tabindex="0"><i class="sw" style="--c:#587A92"></i><b><small>03</small>Hidroizolacija</b><p>Kupatilo, tuš, terasa: dva sloja, traka u svakom uglu i manžetna oko odvoda.</p></li>
+        <li data-layer="3" tabindex="0"><i class="sw" style="--c:#CFCAC0"></i><b><small>04</small>Lepak</b><p>Nazubljena gleterica, češljanje u jednom pravcu. Za ploče veće od 60 cm lepak ide i na poleđinu.</p></li>
+        <li data-layer="4" tabindex="0"><i class="sw" style="--c:#1E5E4E"></i><b><small>05</small>Pločica</b><p>Krstići drže istu širinu fugne, a sistem za nivelisanje poravnava ivice susednih pločica. Prst ne sme da zapne.</p></li>
+        <li data-layer="5" tabindex="0"><i class="sw" style="--c:#ECE8E0"></i><b><small>06</small>Fugna i silikon</b><p>Fugovanje tek kad lepak veže, obično posle 24 sata. U uglovima i uz kadu silikon, jer se tu materijali pomeraju.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="rooms" id="prostorije">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">[ Po prostoriji ]</p>
+        <h2>Svaka prostorija ima <span>svoju zamku.</span></h2>
+      </div>
+      <div class="tiles-grid">
+        <article class="room">
+          <p class="room-n">01</p>
+          <h3>Kupatilo</h3>
+          <p class="trap"><span>Zamka</span>voda ide tamo gde ne treba.</p>
+          <p class="txt">Hidroizolacija ispod tuša i iza kade, pad poda ka slivniku, tuš kanalica u ravni poda — bez praga preko kog se prelazi.</p>
+        </article>
+        <article class="room">
+          <p class="room-n">02</p>
+          <h3>Kuhinja</h3>
+          <p class="trap"><span>Zamka</span>utičnica na pola pločice.</p>
+          <p class="txt">Raspored se crta pre prvog sečenja, da utičnice i ivice elemenata padnu na pravo mesto, a ne na trakicu od dva centimetra.</p>
+        </article>
+        <article class="room">
+          <p class="room-n">03</p>
+          <h3>Terasa</h3>
+          <p class="trap"><span>Zamka</span>prva zima.</p>
+          <p class="txt">Mrazootporne pločice, lepak za spoljne radove i pad od zida ka ivici, da voda ne stoji ni posle pljuska.</p>
+        </article>
+        <article class="room">
+          <p class="room-n">04</p>
+          <h3>Stepenište</h3>
+          <p class="trap"><span>Zamka</span>ivica gazišta.</p>
+          <p class="txt">Gerung pod 45° ili lajsna, protivklizna površina i ista širina fugne na svakom stepeniku, od dna do vrha.</p>
+        </article>
+        <article class="room">
+          <p class="room-n">05</p>
+          <h3>Velike ploče</h3>
+          <p class="trap"><span>Zamka</span>ploča od 120 cm ne oprašta.</p>
+          <p class="txt">Ravna podloga, lepak i na podlogu i na ploču, sistem za nivelisanje i nošenje u dvoje. Inače se ivice ne poklope.</p>
+        </article>
+        <article class="room">
+          <p class="room-n">06</p>
+          <h3>Popravke</h3>
+          <p class="trap"><span>Zamka</span>„ma, samo jedna pločica”.</p>
+          <p class="txt">Zamena napukle pločice, nova fugna umesto pocrnele, silikon oko kade. I sitni poslovi se zakazuju.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="buy" id="kupovina">
+    <div class="wrap buy-grid">
+      <div class="stage stage-box" id="stageBox" role="img" aria-label="3D kutija pločica sa nalepnicom na kojoj piše ton, kalibar i serija">
+        <div class="stage-fallback" aria-hidden="true"></div>
+        <p class="hint" aria-hidden="true">← povucite →</p>
+      </div>
+      <div class="buy-text">
+        <p class="kicker">[ Pre prodavnice ]</p>
+        <h2>Pre nego što kupite pločice</h2>
+        <ol class="tips">
+          <li><b class="big">+10%</b><div><h3>Toliko više uzmite.</h3><p>Za dijagonalno polaganje +15%. Sečenje uvek pojede deo, a dokupljivanje kasnije je lutrija.</p></div></li>
+          <li><b class="big">Ton</b><div><h3>Sve kutije iz iste serije.</h3><p>Na nalepnici pišu ton i kalibar. Moraju biti isti na svakoj kutiji — razlika se inače vidi tek na zidu.</p></div></li>
+          <li><b class="big">+1</b><div><h3>Jedna kutija ostaje u ostavi.</h3><p>Ako za par godina pukne pločica, ista možda više neće postojati u prodaji.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="process" id="kako">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">[ Kako ide ]</p>
+        <h2>Od poruke <span>do fugne.</span></h2>
+      </div>
+      <ol class="steps">
+        <li><span class="step-n">01 / 04</span><h3>Slika i mere na Viber</h3><p>Dovoljna je i rečenica: „kupatilo oko 2 × 1,8, kada ostaje”. Odgovor stiže sa pitanjima koja zaista menjaju cenu.</p></li>
+        <li><span class="step-n">02 / 04</span><h3>Pregled na licu mesta</h3><p>Letva na pod, pogled iza kade, kucanje po starim pločicama. Ako treba ravnanje, piše u ponudi odmah — ne usred posla.</p></li>
+        <li><span class="step-n">03 / 04</span><h3>Ponuda sa spiskom</h3><p>Kvadrati sa rezervom, lepak, masa za fugovanje, hidroizolacija, profili. Kupuje se po spisku, bez viška koji posle stoji u garaži.</p></li>
+        <li><span class="step-n">04 / 04</span><h3>Rad, fugovanje, čišćenje</h3><p>Prostor se predaje bez lepka na pločicama i bez cementne prašine po stanu.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="work" id="radovi">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="kicker">[ Radovi ]</p>
+        <h2>Isti ugao, <span>pre i posle.</span></h2>
+        <p class="intro">Svaki par je snimljen sa istog mesta, da se vidi baš ono što je urađeno.</p>
+      </div>
+      <!-- Fotografije: najviše 5. Zameniti <figcaption> sa <img src="..." alt="..."> -->
+      <div class="work-grid">
+        <figure class="ph-frame big"><span class="tag">Pre</span><figcaption>Ovde ide fotografija:<br>kupatilo pre radova</figcaption></figure>
+        <figure class="ph-frame big"><span class="tag tag-after">Posle</span><figcaption>Ovde ide fotografija:<br>isto kupatilo, isti ugao</figcaption></figure>
+        <figure class="ph-frame sm"><figcaption>Ovde ide fotografija:<br>fugne izbliza</figcaption></figure>
+        <figure class="ph-frame sm"><figcaption>Ovde ide fotografija:<br>terasa ili stepenište</figcaption></figure>
+        <figure class="ph-frame sm"><figcaption>Ovde ide fotografija:<br>zid u kuhinji</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="kontakt">
+    <div class="wrap contact-grid">
+      <div>
+        <p class="kicker">[ Kontakt ]</p>
+        <h2>Pošaljite sliku prostorije. <span>Odatle kreće sve.</span></h2>
+        <p class="intro">Na slici se vidi ono što se teško opiše: ugao, odvod, stare pločice i koliko ih ima. Zato je Viber brži od poziva — ali i poziv je sasvim u redu.</p>
+        <!-- ZAMENITI: tekst pravim brojem i href="tel:+381..." -->
+        <a class="phone" href="#kontakt">Ovde ide telefon</a>
+        <!-- ZAMENITI linkove: viber://chat?number=%2B381..., https://wa.me/381..., profili -->
+        <div class="channels">
+          <a href="#kontakt">Viber <span aria-hidden="true">↗</span></a>
+          <a href="#kontakt">WhatsApp <span aria-hidden="true">↗</span></a>
+          <a href="#kontakt">Instagram <span aria-hidden="true">↗</span></a>
+          <a href="#kontakt">Facebook <span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <div>
+        <dl class="facts">
+          <div><dt>Područje rada</dt><dd>Ovde ide grad i okolina</dd></div>
+          <div><dt>Radno vreme</dt><dd>Ovde ide radno vreme</dd></div>
+          <div><dt>Najbrži odgovor</dt><dd>Viber: slika + okvirne mere</dd></div>
+        </dl>
+        <!-- ZAMENITI: Google Maps <iframe> područja rada -->
+        <div class="map-ph" role="img" aria-label="Mesto za mapu područja rada">Ovde ide mapa područja rada</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="logo" href="#top" aria-label="KUC-KUC — na vrh stranice">
+      <span class="logo-tile" aria-hidden="true"></span>
+      <span class="logo-name">KUC-KUC</span>
+    </a>
+    <nav class="foot-nav" aria-label="Podnožje">
+      <a href="#ispod">Ispod pločice</a>
+      <a href="#prostorije">Prostorije</a>
+      <a href="#kupovina">Pre kupovine</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <p>© 2026 KUC-KUC · keramičarski radovi</p>
+  </div>
+</footer>
+
+<!-- 3D: three.js r160 sa jsDelivr CDN-a. Ako se ne učita, ostaje statičan prikaz. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+
+const small = matchMedia('(max-width: 760px)').matches;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SANS = '"Bricolage Grotesque", "Arial Narrow", Arial, sans-serif';
+const MONO = '"JetBrains Mono", Menlo, Consolas, monospace';
+
+const clamp01 = v => (v < 0 ? 0 : v > 1 ? 1 : v);
+const easeOut = p => 1 - Math.pow(1 - p, 3);
+const easeIn = p => p * p * p;
+const easeInOut = p => (p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
+function rng(seed) {
+  return () => {
+    seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- proceduralne teksture (bez slika) ---------- */
+// glatki šum: male nasumične mreže uvećane sa interpolacijom; zbir težina = 1
+function noise(size, octaves, rnd) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const x = c.getContext('2d', { willReadFrequently: true });
+  x.fillStyle = '#000';
+  x.fillRect(0, 0, size, size);
+  x.globalCompositeOperation = 'lighter';
+  x.imageSmoothingEnabled = true;
+  for (const [n, a] of octaves) {
+    const s = document.createElement('canvas');
+    s.width = s.height = n;
+    const sx = s.getContext('2d');
+    const im = sx.createImageData(n, n);
+    for (let i = 0; i < n * n; i++) {
+      const v = rnd() * 255;
+      im.data[i * 4] = im.data[i * 4 + 1] = im.data[i * 4 + 2] = v;
+      im.data[i * 4 + 3] = 255;
+    }
+    sx.putImageData(im, 0, 0);
+    x.globalAlpha = a;
+    x.drawImage(s, 0, 0, size, size);
+  }
+  const d = x.getImageData(0, 0, size, size).data;
+  const out = new Float32Array(size * size);
+  for (let i = 0; i < out.length; i++) out[i] = d[i * 4] / 255;
+  return out;
+}
+function pixelCanvas(size, fn) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const x = c.getContext('2d');
+  const im = x.createImageData(size, size);
+  fn(im.data, size);
+  x.putImageData(im, 0, 0);
+  return c;
+}
+function tex(canvas, srgb = true) {
+  const t = new THREE.CanvasTexture(canvas);
+  if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 8;
+  return t;
+}
+function concreteCanvas(seed, rgb, size = 512, amp = .5) {
+  const r = rng(seed);
+  const n = noise(size, [[6, .22], [24, .28], [96, .26], [size >> 1, .24]], r);
+  return pixelCanvas(size, d => {
+    for (let i = 0; i < size * size; i++) {
+      let m = 1 + amp * (n[i] - .5) * 2;
+      const q = r();
+      if (q < .012) m *= .7 + r() * .15; else if (q < .02) m *= 1.1;
+      d[i * 4] = Math.min(255, rgb[0] * m);
+      d[i * 4 + 1] = Math.min(255, rgb[1] * m);
+      d[i * 4 + 2] = Math.min(255, rgb[2] * m);
+      d[i * 4 + 3] = 255;
+    }
+  });
+}
+// glazura: blago šarenilo + tamnija ivica gde se glazura skuplja
+function glazeCanvas(seed, rgb, size = 256) {
+  const r = rng(seed);
+  const n = noise(size, [[2, .45], [5, .35], [14, .2]], r);
+  return pixelCanvas(size, d => {
+    for (let y = 0; y < size; y++) for (let x = 0; x < size; x++) {
+      const i = y * size + x;
+      const e = Math.min(x, y, size - 1 - x, size - 1 - y) / size;
+      const pool = 1 - .34 * Math.pow(clamp01(1 - e / .07), 2);
+      const m = (1 + .22 * (n[i] - .5) * 2) * pool;
+      d[i * 4] = rgb[0] * m;
+      d[i * 4 + 1] = rgb[1] * m;
+      d[i * 4 + 2] = rgb[2] * m;
+      d[i * 4 + 3] = 255;
+    }
+  });
+}
+function bumpCanvas(seed, size = 256) {
+  const n = noise(size, [[6, .5], [18, .5]], rng(seed));
+  return pixelCanvas(size, d => {
+    for (let i = 0; i < size * size; i++) {
+      const v = n[i] * 255;
+      d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = v;
+      d[i * 4 + 3] = 255;
+    }
+  });
+}
+// lepak posle nazubljene gleterice: meka rebra (visinska mreža) na tankom sloju, idu duž z ose
+function ridgeGeometry(w, depth, count, h, base) {
+  const seg = count * 10, pitch = w / count, r = rng(count);
+  const amp = Array.from({ length: count + 1 }, () => .72 + r() * .28);
+  const top = new THREE.PlaneGeometry(w, depth, seg, 14);
+  top.rotateX(-Math.PI / 2);
+  const p = top.attributes.position;
+  for (let i = 0; i < p.count; i++) {
+    const z = p.getZ(i);
+    // rebra blago vijugaju i nisu sva iste visine, kao posle ruke
+    const x = p.getX(i) + w / 2 + Math.sin(z * 5.3 + p.getX(i) * 1.7) * pitch * .07;
+    const c = .5 + .5 * Math.cos((x / pitch) * Math.PI * 2);
+    const k = clamp01(c * 1.7 - .35);
+    const a = amp[Math.min(count, Math.round(x / pitch))] * (.92 + .08 * Math.sin(z * 9 + x * 3));
+    p.setY(i, base + h * a * k * k * (3 - 2 * k));
+  }
+  top.computeVertexNormals();
+  const slab = new THREE.BoxGeometry(w, base, depth);
+  slab.translate(0, base / 2, 0);
+  const g = new THREE.BufferGeometry();
+  // spoji dve geometrije (bez dodatnih biblioteka)
+  const parts = [top.toNonIndexed(), slab.toNonIndexed()];
+  ['position', 'normal', 'uv'].forEach(name => {
+    const arr = [];
+    parts.forEach(q => arr.push(...q.attributes[name].array));
+    g.setAttribute(name, new THREE.Float32BufferAttribute(arr, name === 'uv' ? 2 : 3));
+  });
+  return g;
+}
+function tileMaterials(map, bump, envI = 1.1) {
+  const top = new THREE.MeshPhysicalMaterial({
+    map, bumpMap: bump, bumpScale: .35,
+    roughness: .22, clearcoat: 1, clearcoatRoughness: .04,
+    envMapIntensity: envI, transparent: true
+  });
+  const side = new THREE.MeshStandardMaterial({ color: 0xCDB497, roughness: .85, transparent: true });
+  // RoundedBoxGeometry grupe: +x, -x, +y (lice), -y, +z, -z
+  return { top, side, list: [side, side, top, side, side, side] };
+}
+function keyLight(scene, pos, size, mapSize) {
+  const key = new THREE.DirectionalLight(0xFFF1DE, 2.6);
+  key.position.set(...pos);
+  key.castShadow = true;
+  key.shadow.mapSize.set(mapSize, mapSize);
+  const c = key.shadow.camera;
+  c.left = -size; c.right = size; c.top = size; c.bottom = -size; c.near = 1; c.far = 22;
+  key.shadow.bias = -.0004;
+  key.shadow.normalBias = .02;
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xC4D6FF, .45);
+  fill.position.set(-pos[0] * .8, pos[1] * .5, -pos[2]);
+  scene.add(fill);
+  return key;
+}
+
+/* ---------- studio: soba i svetlosni paneli koji se ogledaju u glazuri ---------- */
+function studio(renderer, { wall = 0x161615, floor = 0x0c0c0b, boxes = null }) {
+  const env = new THREE.Scene();
+  const room = new THREE.Mesh(new THREE.BoxGeometry(24, 14, 24), new THREE.MeshBasicMaterial({ color: wall, side: THREE.BackSide }));
+  room.position.y = 5;
+  env.add(room);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(24, 24), new THREE.MeshBasicMaterial({ color: floor }));
+  fl.rotation.x = -Math.PI / 2;
+  fl.position.y = -1.9;
+  env.add(fl);
+  (boxes || [
+    // [širina, visina, x, y, z, jačina] — paneli oko scene, na visini odsjaja
+    [1.5, 5.2, 0, 7.5, -9.5, 3.4],
+    [1, 5, 8.6, 7.5, -4.4, 2.8],
+    [2.4, 4, 7.8, 7.4, 5.2, 2.2],
+    [1.2, 5, -5.6, 7.5, 7.6, 3],
+    [3.2, 1.8, -9.2, 7.8, -1.6, 2.4],
+    [12, 12, 0, 11.6, 0, .55]
+  ]).forEach(([w, h, x, y, z, k]) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }));
+    m.material.color.setScalar(k);
+    m.position.set(x, y, z);
+    m.lookAt(0, 0, 0);
+    env.add(m);
+  });
+  const pm = new THREE.PMREMGenerator(renderer);
+  const t = pm.fromScene(env, .02).texture;
+  pm.dispose();
+  return t;
+}
+
+/* ---------- pozornica (jedan renderer po sceni, crta samo kad je vidljiva) ---------- */
+const stages = [];
+function makeStage(el, opts = {}) {
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.6 : 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = opts.exposure || 1;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.localClippingEnabled = !!opts.clipping;
+  el.prepend(renderer.domElement);
+  const scene = new THREE.Scene();
+  scene.environment = studio(renderer, opts.studio || {});
+  const camera = new THREE.PerspectiveCamera(opts.fov || 30, 1, .1, 100);
+  const st = { el, renderer, scene, camera, aspect: 1, t: 0, spin: 0, vel: 0, dragging: false, visible: false, dirty: true, live: false, update: null, fit: null };
+  renderer.domElement.addEventListener('webglcontextlost', e => { e.preventDefault(); el.classList.remove('is-live'); st.update = null; });
+  return st;
+}
+function resize(st) {
+  const w = st.el.clientWidth, h = st.el.clientHeight;
+  if (!w || !h) return;
+  st.renderer.setSize(w, h, false);
+  st.aspect = w / h;
+  st.camera.aspect = st.aspect;
+  if (st.fit) st.fit();
+  st.camera.updateProjectionMatrix();
+  st.dirty = true;
+}
+function attach(st) {
+  new ResizeObserver(() => resize(st)).observe(st.el);
+  new IntersectionObserver(([en]) => { st.visible = en.isIntersecting; }, { rootMargin: '100px' }).observe(st.el);
+  // vrtenje prevlačenjem levo-desno (uspravno skrolovanje ostaje slobodno)
+  const c = st.renderer.domElement;
+  let id = null, lx = 0;
+  c.addEventListener('pointerdown', e => { id = e.pointerId; lx = e.clientX; st.dragging = true; st.vel = 0; c.setPointerCapture(id); });
+  c.addEventListener('pointermove', e => {
+    if (e.pointerId !== id) return;
+    const dx = (e.clientX - lx) * .009;
+    lx = e.clientX;
+    st.spin += dx; st.vel = dx; st.dirty = true;
+  });
+  const up = e => { if (e.pointerId === id) { id = null; st.dragging = false; } };
+  c.addEventListener('pointerup', up);
+  c.addEventListener('pointercancel', up);
+  resize(st);
+  stages.push(st);
+}
+function orbit(camera, az, el, R, ty) {
+  camera.position.set(Math.sin(az) * Math.cos(el) * R, ty + Math.sin(el) * R, Math.cos(az) * Math.cos(el) * R);
+  camera.lookAt(0, ty, 0);
+}
+
+/* ---------- zvuk kucanja: kratak, pun "tok", dvaput (kuc-kuc) ---------- */
+let actx = null;
+function knockSound() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume();
+    const out = actx.createGain();
+    out.gain.value = .45;
+    out.connect(actx.destination);
+    [0, .15].forEach((d, k) => {
+      const t0 = actx.currentTime + .01 + d;
+      // telo udarca: nizak ton koji se brzo gasi (puna pločica ne odzvanja)
+      const o = actx.createOscillator();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(k ? 240 : 270, t0);
+      o.frequency.exponentialRampToValueAtTime(105, t0 + .08);
+      const g = actx.createGain();
+      g.gain.setValueAtTime(.0001, t0);
+      g.gain.exponentialRampToValueAtTime(.9, t0 + .004);
+      g.gain.exponentialRampToValueAtTime(.0001, t0 + .11);
+      o.connect(g).connect(out);
+      o.start(t0);
+      o.stop(t0 + .13);
+      // klik zgloba o glazuru
+      const len = Math.floor(actx.sampleRate * .03);
+      const buf = actx.createBuffer(1, len, actx.sampleRate);
+      const ch = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) ch[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      const src = actx.createBufferSource();
+      src.buffer = buf;
+      const bp = actx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 1900; bp.Q.value = 1.1;
+      const g2 = actx.createGain();
+      g2.gain.value = .55;
+      src.connect(bp).connect(g2).connect(out);
+      src.start(t0);
+    });
+  } catch (e) { /* bez zvuka, ostaje vizuelni odgovor */ }
+}
+
+/* ==========================================================================
+   1) HERO — polaganje uživo: lepak, pločice, krstići, fugovanje
+   ========================================================================== */
+function heroScene(st) {
+  const { scene, camera } = st;
+  const N = 4, S = 1, G = .05, T = .09, P = S + G, W = N * S + (N - 1) * G;
+  const Y_BED = .014, RIDGE = .05, Y_TILE = .045 + T / 2, Y_SP = .105, Y_GROUT = .124;
+  const T_BED = .25, D_BED = 1.35, T_TILES = 1.7, STAG = .3, DROP = .58;
+  const T_OUT = T_TILES + (N * N - 1) * STAG + DROP + .75;
+  const T_GROUT = T_OUT + .55, D_GROUT = 1.4, CYCLE = T_GROUT + D_GROUT + 3.6;
+  const pos = i => (i - (N - 1) / 2) * P;
+  const rnd = rng(3);
+
+  // estrih: kružna ploča koja se gubi u tamnoj pozadini
+  const fade = document.createElement('canvas');
+  fade.width = fade.height = 256;
+  const fx = fade.getContext('2d');
+  const gr = fx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  gr.addColorStop(0, '#fff'); gr.addColorStop(.42, '#eee'); gr.addColorStop(.75, '#555'); gr.addColorStop(1, '#000');
+  fx.fillStyle = gr; fx.fillRect(0, 0, 256, 256);
+  const ground = new THREE.Mesh(
+    new THREE.CircleGeometry(3.3, 72),
+    new THREE.MeshStandardMaterial({ map: tex(concreteCanvas(11, [96, 92, 86], small ? 512 : 1024, .22)), alphaMap: tex(fade, false), transparent: true, depthWrite: false, roughness: .9, envMapIntensity: .8 })
+  );
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
+  scene.add(ground);
+
+  // lepak (jedno polje po pločici, da se pod njom "spljošti")
+  const clip = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+  const bedMap = tex(concreteCanvas(5, [150, 146, 138], 256, .25));
+  bedMap.wrapS = bedMap.wrapT = THREE.RepeatWrapping;
+  bedMap.repeat.set(1.6, 1.6);
+  const bedMat = new THREE.MeshStandardMaterial({ map: bedMap, roughness: .97, envMapIntensity: .6, clippingPlanes: [clip], clipShadows: true });
+  const ridgeGeo = ridgeGeometry(P, P, 12, RIDGE, Y_BED);
+  const cells = [];
+  for (let i = 0; i < N * N; i++) {
+    const m = new THREE.Mesh(ridgeGeo, bedMat);
+    m.position.set(pos(i % N), 0, pos(Math.floor(i / N)));
+    m.castShadow = m.receiveShadow = true;
+    scene.add(m);
+    cells.push(m);
+  }
+
+  // pločice
+  const glazes = [[24, 84, 68], [21, 77, 62], [28, 92, 75]].map((c, i) => tex(glazeCanvas(21 + i, c)));
+  const bump = tex(bumpCanvas(9), false);
+  const tileGeo = new RoundedBoxGeometry(S, T, S, 3, .022);
+  const tiles = [];
+  for (let i = 0; i < N * N; i++) {
+    const r = Math.floor(i / N), c = i % N;
+    const mats = tileMaterials(glazes[(r * 2 + c) % 3], bump);
+    const m = new THREE.Mesh(tileGeo, mats.list);
+    m.castShadow = m.receiveShadow = true;
+    m.visible = false;
+    scene.add(m);
+    tiles.push({ m, mats, r, c, sx: rnd() - .5, sz: rnd() - .5 });
+  }
+
+  // krstići
+  const armGeo = new THREE.BoxGeometry(.32, .1, G * .8);
+  const spacers = [];
+  for (let r = 0; r < N - 1; r++) for (let c = 0; c < N - 1; c++) {
+    const mat = new THREE.MeshPhysicalMaterial({ color: 0xE8461E, roughness: .42, clearcoat: .5, clearcoatRoughness: .3, transparent: true });
+    const g = new THREE.Group();
+    const a = new THREE.Mesh(armGeo, mat), b = new THREE.Mesh(armGeo, mat);
+    b.rotation.y = Math.PI / 2;
+    a.castShadow = b.castShadow = true;
+    g.add(a, b);
+    g.position.set(pos(c) + P / 2, Y_SP, pos(r) + P / 2);
+    g.visible = false;
+    scene.add(g);
+    const last = (r + 1) * N + (c + 1);
+    spacers.push({ g, mat, j: spacers.length, s0: T_TILES + last * STAG + DROP * .85 });
+  }
+
+  // fugna
+  const groutMap = tex(concreteCanvas(8, [228, 224, 215], 256, .18));
+  groutMap.wrapS = groutMap.wrapT = THREE.RepeatWrapping;
+  groutMap.repeat.set(2, 2);
+  const grout = new THREE.Mesh(new THREE.BoxGeometry(W - .006, 1, W - .006), new THREE.MeshStandardMaterial({ map: groutMap, roughness: .95, envMapIntensity: .7 }));
+  grout.receiveShadow = true;
+  grout.visible = false;
+  scene.add(grout);
+
+  keyLight(scene, [-3.4, 6.6, 2.6], 3.6, small ? 1024 : 2048);
+
+  let R = 10;
+  const EL = .68, TY = .05;
+  st.fit = () => {
+    const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+    R = Math.max(2.6 / tv, 3.25 / (tv * st.aspect));
+  };
+  const phaseEl = document.getElementById('heroPhase');
+  let lastPhase = '', lastOp = -1, off = 0;
+
+  // kucanje: dodir ili klik na položenu pločicu
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  const ringGeo = new THREE.RingGeometry(.84, 1, 48);
+  ringGeo.rotateX(-Math.PI / 2);
+  const rings = [0, 1].map(() => {
+    const m = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color: 0xE8461E, transparent: true, opacity: 0, depthWrite: false }));
+    m.visible = false;
+    m.renderOrder = 10; // crta se posle (providnih) pločica
+    scene.add(m);
+    return { m, t0: -9 };
+  });
+  let knockT = -9;
+  const cnv = st.renderer.domElement;
+  const pick = (cx, cy) => {
+    const r = cnv.getBoundingClientRect();
+    ndc.set((cx - r.left) / r.width * 2 - 1, -((cy - r.top) / r.height) * 2 + 1);
+    ray.setFromCamera(ndc, camera);
+    const hit = ray.intersectObjects(tiles.filter(o => o.p >= 1).map(o => o.m), false)[0];
+    return hit ? { point: hit.point, o: tiles.find(o => o.m === hit.object) } : null;
+  };
+  let down = null;
+  cnv.addEventListener('pointerdown', e => { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  cnv.addEventListener('pointerup', e => {
+    if (!down) return;
+    const tap = Math.hypot(e.clientX - down.x, e.clientY - down.y) < 8 && performance.now() - down.t < 500;
+    down = null;
+    if (!tap) return;
+    const h = pick(e.clientX, e.clientY);
+    if (!h) return;
+    h.o.knockT = knockT = st.t;
+    rings.forEach((R, i) => { R.t0 = st.t + i * .15; R.m.position.set(h.point.x, Y_TILE + T / 2 + .004, h.point.z); });
+    knockSound();
+    st.dirty = true;
+  });
+  cnv.addEventListener('pointermove', e => {
+    if (e.buttons || e.pointerType !== 'mouse') return;
+    cnv.style.cursor = pick(e.clientX, e.clientY) ? 'pointer' : '';
+  });
+  st.busy = () => st.t - knockT < 2.6;
+  const tap = x => (x > 0 && x < .12 ? Math.sin(Math.PI * x / .12) : 0);
+
+  st.update = (time, dt) => {
+    let t = reduce ? T_GROUT + D_GROUT + 1 : (time - off) % CYCLE;
+    // dok neko kuca, gotov pod ostaje (ne kreće ispočetka)
+    if (!reduce && time - knockT < 5 && t > T_GROUT + D_GROUT && t < CYCLE - .6) off += dt;
+    const pb = easeInOut(clamp01((t - T_BED) / D_BED));
+    clip.constant = -N * P / 2 - .03 + pb * (N * P + .06);
+
+    let placed = 0;
+    tiles.forEach((o, i) => {
+      const p = clamp01((t - (T_TILES + i * STAG)) / DROP);
+      cells[i].scale.y = 1 - .3 * clamp01((p - .78) / .22);
+      o.p = p;
+      o.m.visible = p > 0;
+      if (p <= 0) return;
+      const e = easeOut(p);
+      const dip = Math.sin(Math.PI * clamp01((p - .74) / .26)) * .016;
+      const kd = o.knockT == null ? 0 : .012 * (tap(time - o.knockT) + tap(time - o.knockT - .15));
+      o.m.position.set(pos(o.c), Y_TILE + (1 - e) * 1.3 - dip - kd, pos(o.r));
+      o.m.rotation.set((1 - e) * .32 * o.sx, 0, (1 - e) * .32 * o.sz);
+      o.mats.top.opacity = o.mats.side.opacity = clamp01(p / .28);
+      if (p > .7) placed++;
+    });
+
+    spacers.forEach(s => {
+      const p = clamp01((t - s.s0) / .34);
+      const q = clamp01((t - (T_OUT + s.j * .06)) / .45);
+      s.g.visible = p > 0 && q < 1;
+      if (!s.g.visible) return;
+      s.g.position.y = Y_SP + (1 - easeOut(p)) * .55 + easeIn(q) * .9;
+      s.g.rotation.y = easeIn(q) * .8;
+      s.mat.opacity = clamp01(p / .35) * (1 - q);
+      s.g.children.forEach(a => { a.castShadow = s.mat.opacity > .6; });
+    });
+
+    rings.forEach(R => {
+      const a = (time - R.t0) / .5;
+      R.m.visible = a >= 0 && a < 1;
+      if (!R.m.visible) return;
+      R.m.scale.setScalar(.06 + easeOut(a) * .38);
+      R.m.material.opacity = (1 - a) * .9;
+    });
+
+    const pg = easeInOut(clamp01((t - T_GROUT) / D_GROUT));
+    grout.visible = pg > 0;
+    const h = .002 + pg * (Y_GROUT - Y_BED);
+    grout.scale.y = h;
+    grout.position.y = Y_BED + h / 2;
+
+    orbit(camera, .55 + (reduce ? 0 : time * .1) + st.spin, EL, R, TY);
+
+    const op = reduce ? 1 : Math.min(clamp01(t / .35), 1 - clamp01((t - (CYCLE - .4)) / .4));
+    if (Math.abs(op - lastOp) > .01) { st.renderer.domElement.style.opacity = op.toFixed(2); lastOp = op; }
+
+    let ph;
+    if (t < T_TILES) ph = '01 · Lepak — nazubljena gleterica';
+    else if (t < T_OUT) ph = '02 · Pločica ' + String(Math.max(1, placed)).padStart(2, '0') + ' / 16';
+    else if (t < T_GROUT) ph = '03 · Krstići napolje';
+    else if (t < T_GROUT + D_GROUT) ph = '04 · Fugovanje — 2 mm';
+    else ph = 'Gotovo · kucnite bilo koju';
+    if (time - knockT < 2.4) ph = 'Kuc-kuc · puno, ispod nema šupljine';
+    if (ph !== lastPhase) { phaseEl.textContent = ph; lastPhase = ph; }
+  };
+}
+
+/* ==========================================================================
+   2) PRESEK — šest slojeva se razmiču i vrte
+   ========================================================================== */
+function layersScene(st) {
+  const { scene, camera } = st;
+  const F = 3, GAP = .34, LIFT = .2;
+  const NAMES = ['Podloga', 'Prajmer', 'Hidroizolacija', 'Lepak', 'Pločica', 'Fugna i silikon'];
+  const BASE = [0, .42, .434, .484, .53, .53];
+  const root = new THREE.Group();
+  scene.add(root);
+  const layers = [];
+  const add = (obj, h) => {
+    obj.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+    const g = new THREE.Group();
+    g.add(obj);
+    root.add(g);
+    layers.push({ g, h, act: 0 });
+  };
+
+  // bočne strane dobijaju istu teksturu u pravoj razmeri, da beton ne liči na drvo
+  const slabMap = tex(concreteCanvas(31, [140, 135, 126], 512, .24));
+  const slabSide = slabMap.clone();
+  slabSide.repeat.set(1, .42 / F);
+  slabSide.needsUpdate = true;
+  const sTop = new THREE.MeshStandardMaterial({ map: slabMap, roughness: .95 });
+  const sSide = new THREE.MeshStandardMaterial({ map: slabSide, roughness: .95 });
+  const slab = new THREE.Mesh(new RoundedBoxGeometry(F, .42, F, 2, .012), [sSide, sSide, sTop, sTop, sSide, sSide]);
+  slab.position.y = .21;
+  add(slab, .42);
+
+  const primer = new THREE.Mesh(new THREE.BoxGeometry(F, .014, F), new THREE.MeshPhysicalMaterial({ color: 0xD99A86, roughness: .2, clearcoat: .7, transparent: true, opacity: .92 }));
+  primer.position.y = .007;
+  add(primer, .014);
+
+  const hydro = new THREE.Mesh(new RoundedBoxGeometry(F, .05, F, 2, .008), new THREE.MeshStandardMaterial({ map: tex(concreteCanvas(41, [86, 120, 145], 256, .22)), roughness: .48 }));
+  hydro.position.y = .025;
+  add(hydro, .05);
+
+  const glueMap = tex(concreteCanvas(43, [160, 156, 147], 256, .25));
+  glueMap.wrapS = glueMap.wrapT = THREE.RepeatWrapping;
+  add(new THREE.Mesh(ridgeGeometry(F, F, 34, .048, .014), new THREE.MeshStandardMaterial({ map: glueMap, roughness: .97 })), .062);
+
+  const s = (F - .06) / 2;
+  const tg = new THREE.Group();
+  const tGeo = new RoundedBoxGeometry(s, .08, s, 3, .02);
+  const bump = tex(bumpCanvas(19), false);
+  [[24, 84, 68], [21, 77, 62], [28, 92, 75], [24, 84, 68]].forEach((c, i) => {
+    const mats = tileMaterials(tex(glazeCanvas(51 + i, c)), bump, 1.2);
+    mats.top.transparent = mats.side.transparent = false;
+    const m = new THREE.Mesh(tGeo, mats.list);
+    m.position.set((i % 2 ? 1 : -1) * (s / 2 + .03), .04, (i < 2 ? -1 : 1) * (s / 2 + .03));
+    tg.add(m);
+  });
+  add(tg, .08);
+
+  const fugna = new THREE.Group();
+  const fMat = new THREE.MeshStandardMaterial({ color: 0xE9E5DD, roughness: .92 });
+  const fa = new THREE.Mesh(new THREE.BoxGeometry(F - .004, .07, .056), fMat);
+  const fb = new THREE.Mesh(new THREE.BoxGeometry(.056, .07, F - .004), fMat);
+  fa.position.y = fb.position.y = .035;
+  fugna.add(fa, fb);
+  add(fugna, .07);
+
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(16, 16), new THREE.ShadowMaterial({ opacity: .2 }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.position.y = -.55;
+  shadow.receiveShadow = true;
+  scene.add(shadow);
+
+  keyLight(scene, [-2.6, 7, 2.2], 3.4, small ? 1024 : 2048);
+
+  let R = 10, ty = .8;
+  const EL = .4;
+  st.fit = () => {
+    const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+    R = Math.max(2.35 / tv, 2.55 / (tv * st.aspect));
+  };
+
+  const items = [...document.querySelectorAll('#layers li')];
+  const nameEl = document.getElementById('layerName');
+  let manual = null, manualUntil = 0, shown = -2;
+  items.forEach((li, i) => {
+    const pick = () => { manual = i; manualUntil = st.t + 6; st.dirty = true; };
+    li.addEventListener('pointerenter', pick);
+    li.addEventListener('focus', pick);
+    li.addEventListener('click', pick);
+  });
+
+  st.update = (time, dt) => {
+    const e = reduce ? .85 : .62 - .38 * Math.cos(time * Math.PI * 2 / 12);
+    const k = manual !== null && (reduce || time < manualUntil) ? manual : (reduce ? -1 : Math.floor(time / 2.2) % 6);
+    let below = 0, top = 0;
+    layers.forEach((L, i) => {
+      const target = i === k ? 1 : 0;
+      L.act = reduce ? target : L.act + (target - L.act) * Math.min(1, dt * 7);
+      const y = BASE[i] + i * GAP * e + LIFT * (below + L.act);
+      below += 2 * L.act;
+      L.g.position.y = y;
+      top = Math.max(top, y + L.h);
+    });
+    root.rotation.y = .75 + (reduce ? 0 : time * .2) + st.spin;
+    ty += (top * .5 - .1 - ty) * (reduce ? 1 : Math.min(1, dt * 3));
+    orbit(camera, 0, EL, R, ty);
+
+    if (k !== shown) {
+      shown = k;
+      items.forEach((li, i) => li.classList.toggle('is-on', i === k));
+      nameEl.textContent = k < 0 ? 'Šest slojeva' : String(k + 1).padStart(2, '0') + ' · ' + NAMES[k];
+    }
+  };
+}
+
+/* ==========================================================================
+   3) KUTIJA — nalepnica: ton, kalibar, serija
+   ========================================================================== */
+function kraft(x, w, h, seed) {
+  const r = rng(seed);
+  x.fillStyle = '#AE8657';
+  x.fillRect(0, 0, w, h);
+  for (let i = 0; i < 160; i++) {
+    x.fillStyle = r() < .5 ? `rgba(80,52,24,${.012 + r() * .022})` : `rgba(236,206,160,${.012 + r() * .022})`;
+    const rr = 10 + r() * 50;
+    x.beginPath();
+    x.ellipse(r() * w, r() * h, rr, rr * (.4 + r() * .6), r() * 3, 0, 7);
+    x.fill();
+  }
+  const n = Math.round(w * h / 90);
+  for (let i = 0; i < n; i++) {
+    x.strokeStyle = r() < .6 ? `rgba(62,40,18,${.06 + r() * .12})` : `rgba(250,226,186,${.06 + r() * .12})`;
+    x.lineWidth = .6 + r() * .8;
+    const px = r() * w, py = r() * h, a = r() * Math.PI, l = 3 + r() * 9;
+    x.beginPath();
+    x.moveTo(px, py);
+    x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l);
+    x.stroke();
+  }
+}
+function tileMark(x, px, py, s, color) {
+  x.fillStyle = color;
+  const q = (s - 4) / 2;
+  x.fillRect(px, py, q, q); x.fillRect(px + q + 4, py, q, q);
+  x.fillRect(px, py + q + 4, q, q); x.fillRect(px + q + 4, py + q + 4, q, q);
+}
+function boxTop(x, rx) {
+  const w = 1024, h = 540, ink = 'rgba(40,27,15,.88)';
+  kraft(x, w, h, 77);
+  rx.fillStyle = 'rgb(232,232,232)';
+  rx.fillRect(0, 0, w, h);
+  x.fillStyle = ink;
+  x.textBaseline = 'alphabetic';
+  x.font = `800 74px ${SANS}`;
+  x.fillText('GRANITNA', 50, 146);
+  x.fillText('KERAMIKA', 50, 226);
+  x.font = `600 29px ${MONO}`;
+  x.fillText('30 × 60 cm · 8 kom · 1,44 m²', 54, 304);
+  tileMark(x, 54, 356, 64, ink);
+  x.font = `700 24px ${MONO}`;
+  x.fillText('KLASA I', 140, 382);
+  x.fillText('REKTIFIKOVANA', 140, 414);
+  // nalepnica
+  const lab = (c, fill) => { c.save(); c.translate(800, 272); c.rotate(-.02); fill(c); c.restore(); };
+  lab(rx, c => { c.fillStyle = 'rgb(110,110,110)'; c.fillRect(-176, -214, 352, 428); });
+  lab(x, c => {
+    c.shadowColor = 'rgba(40,24,8,.35)'; c.shadowBlur = 8; c.shadowOffsetY = 2;
+    c.fillStyle = '#F8F6F0';
+    c.fillRect(-176, -214, 352, 428);
+    c.shadowColor = 'transparent';
+    c.strokeStyle = '#151515'; c.lineWidth = 4;
+    c.strokeRect(-160, -198, 320, 396);
+    c.fillStyle = '#151515';
+    const row = (y, k, v, big) => {
+      c.font = `700 22px ${MONO}`; c.textAlign = 'left'; c.fillText(k, -140, y);
+      c.font = big ? `800 74px ${SANS}` : `700 34px ${MONO}`; c.textAlign = 'right'; c.fillText(v, 140, y + (big ? 14 : 4));
+    };
+    row(-130, 'TON', '04', true);
+    c.fillRect(-160, -100, 320, 3);
+    row(-30, 'KALIBAR', '9', true);
+    c.fillRect(-160, 0, 320, 3);
+    row(56, 'SERIJA', '26-118', false);
+    const r = rng(5);
+    let bx = -140;
+    while (bx < 136) { const bw = 2 + Math.floor(r() * 5); if (r() > .42) c.fillRect(bx, 96, bw, 74); bx += bw + 1; }
+    c.textAlign = 'left';
+  });
+}
+function boxSide(x, w, h, seed, long) {
+  kraft(x, w, h, seed);
+  const ink = 'rgba(40,27,15,.86)';
+  x.fillStyle = ink;
+  x.textBaseline = 'middle';
+  if (long) {
+    x.font = `800 92px ${SANS}`;
+    x.fillText('30 × 60', 40, h / 2 + 6);
+    x.font = `600 28px ${MONO}`;
+    x.fillText('GRANITNA KERAMIKA · KLASA I', 400, h / 2);
+    tileMark(x, w - 96, h / 2 - 28, 56, ink);
+  } else {
+    tileMark(x, w / 2 - 34, 34, 68, ink);
+    x.font = `700 30px ${MONO}`;
+    x.textAlign = 'center';
+    x.fillText('TON 04 · KAL. 9', w / 2, h - 48);
+    x.textAlign = 'left';
+  }
+}
+function boxScene(st) {
+  const { scene, camera } = st;
+  const L = 1.9, H = .34, D = 1;
+  const mk = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+  const topC = mk(1024, 540), roughC = mk(1024, 540), longC = mk(1024, 184), endC = mk(540, 184), botC = mk(256, 128);
+  const draw = () => {
+    boxTop(topC.getContext('2d'), roughC.getContext('2d'));
+    boxSide(longC.getContext('2d'), 1024, 184, 81, true);
+    boxSide(endC.getContext('2d'), 540, 184, 83, false);
+    kraft(botC.getContext('2d'), 256, 128, 85);
+  };
+  draw();
+  const topT = tex(topC), roughT = tex(roughC, false), longT = tex(longC), endT = tex(endC), botT = tex(botC);
+  const card = (map, extra = {}) => new THREE.MeshStandardMaterial({ map, roughness: .9, envMapIntensity: .7, ...extra });
+  const topM = card(topT, { roughness: 1, roughnessMap: roughT });
+  const box = new THREE.Mesh(new RoundedBoxGeometry(L, H, D, 3, .022), [card(endT), card(endT), topM, card(botT), card(longT), card(longT)]);
+  box.castShadow = box.receiveShadow = true;
+  box.position.y = H / 2;
+  const turn = new THREE.Group();
+  turn.add(box);
+  scene.add(turn);
+  // kad se fontovi učitaju, nalepnica se ponovo iscrta pravim slovima
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => { draw(); [topT, roughT, longT, endT].forEach(t => { t.needsUpdate = true; }); st.dirty = true; });
+  }
+
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.ShadowMaterial({ opacity: .24 }));
+  shadow.rotation.x = -Math.PI / 2;
+  shadow.receiveShadow = true;
+  scene.add(shadow);
+  keyLight(scene, [-2.2, 6, 2.8], 2.2, small ? 1024 : 2048);
+
+  let R = 8;
+  const EL = .6;
+  st.fit = () => {
+    const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2);
+    R = Math.max(1 / tv, 1.28 / (tv * st.aspect));
+  };
+  st.update = time => {
+    turn.rotation.y = -.55 + (reduce ? 0 : time * .32) + st.spin;
+    orbit(camera, 0, EL, R, .12);
+  };
+}
+
+/* ---------- pokretanje ---------- */
+[
+  ['stageHero', heroScene, { clipping: true, fov: 30 }],
+  ['stageLayers', layersScene, { fov: 28, studio: { wall: 0x8A8884, floor: 0x9A968F } }],
+  ['stageBox', boxScene, { fov: 28, studio: { wall: 0x8A8884, floor: 0x9A968F } }]
+].forEach(([id, fn, o]) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  try {
+    const st = makeStage(el, o);
+    fn(st);
+    attach(st);
+  } catch (err) {
+    console.warn('3D nije dostupan:', id, err);
+  }
+});
+
+let last = performance.now();
+function frame() {
+  const now = performance.now();
+  const dt = Math.min((now - last) / 1000, 1 / 20);
+  last = now;
+  if (!document.hidden) {
+    for (const st of stages) {
+      if (!st.visible || !st.update) continue;
+      if (!st.dragging && st.vel) { st.spin += st.vel; st.vel *= .93; if (Math.abs(st.vel) < 1e-4) st.vel = 0; }
+      const busy = st.busy ? st.busy() : false;
+      if (!reduce || busy) st.t += dt;
+      if (!reduce || busy || st.dirty || st.dragging || st.vel) {
+        st.update(st.t, dt);
+        st.renderer.render(st.scene, st.camera);
+        st.dirty = false;
+        if (!st.live) { st.live = true; st.el.classList.add('is-live'); }
+      }
+    }
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+if (window.__KK_DEBUG) window.__fuga = stages;
+</script>
+
+<!-- DEMO traka (DANN.web.workshop) - nalepi pre </body> na svakoj stranici demo sajta -->
+<div id="dann-demo" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 10px;padding:10px 16px;background:#17181A;color:#F2F0EB;font:500 14px/1.4 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;text-align:center;box-shadow:0 -4px 16px rgba(0,0,0,.25)">
+  <b style="background:#C1361E;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;letter-spacing:.08em">DEMO</b>
+  <span>Ovaj biznis ne postoji. Sajt je primer rada <a href="https://dannwebworkshop.rs" target="_blank" rel="noopener" style="color:#F28670;font-weight:700;text-decoration:none">DANN.web.workshop</a></span>
+</div>
+<style>body{padding-bottom:64px}@media(max-width:520px){body{padding-bottom:86px}}</style>
+</body>
+</html>
